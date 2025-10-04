@@ -9,7 +9,7 @@ from dash import Dash
 from dash.dependencies import Input, Output
 
 
-# Общие стили вынесены в словарь
+# Общие стили вынесем в словарь
 STYLES = {
     "title": {
         "textAlign": "center",
@@ -127,19 +127,19 @@ def create_dashapp(server):
                 "avg_margin": article.avg_margin,
             } for article in articles])
 
-            # Если датафрейм пустой
+            # Если датафрейм пустой или в нём только одна категория, выводим вместо дашборда информационное сообщение
             if df.empty:
                 return html.Div("Нет данных для выбранного магазина", style=STYLES["empty_message"])
             if df["category"].nunique() <= 1:
                 return html.Div("Данные по магазину ограничены, анализ категорий невозможен", style=STYLES["empty_message"])
 
-            # Фильтрация и очистка
+            # Фильтрация и очистка данных в соответствии с особенностями данных в БД
             df = df[(df["arts_amount"] > 10) & (df["revenue"] > 100)]
             df = df[df["category"].str.len() > 3]
             df = df[df["category"] != "#пусто"]  # убираем категорию "#пусто"
             df["category_short"] = df["category"].str.slice(0, 50)
 
-        # Графики
+        # Строим визуализацию: круговые диаграммы, линейчатые диаграммы и графики
         pie_num_of_arts = px.pie(df.head(20),
                                  values="arts_amount",
                                  names="category_short",
@@ -192,7 +192,7 @@ def create_dashapp(server):
                               height=600,
                               labels={"category_short": "Название категории", "avg_margin": "Ср. прибыль, %"})
 
-        # Компоновка
+        # Компонуем графики на web-странице
         upper_div = html.Div([dcc.Graph(figure=pie_num_of_arts), dcc.Graph(figure=pie_revenue)], style=STYLES["flex_row"])
         central_div = html.Div([dcc.Graph(figure=bar_stuck), dcc.Graph(figure=bar_stunted)], style=STYLES["flex_row"])
         lower_div = html.Div([dcc.Graph(figure=line_avg_sales), dcc.Graph(figure=line_margin)], style=STYLES["flex_row"])
