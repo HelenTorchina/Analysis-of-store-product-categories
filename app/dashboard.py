@@ -3,7 +3,6 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
 from sqlalchemy import func, case
-
 from .server import db
 from .models import TabulatorShopRemainder, TabulatorTables
 from dash import Dash
@@ -43,7 +42,7 @@ STYLES = {
 
 
 def create_dashapp(server):
-    # Initialize the app
+    # Инициализация приложения
     app = Dash(__name__, server=server)
 
     with app.server.app_context():
@@ -68,13 +67,13 @@ def create_dashapp(server):
         html.Div(id="charts-container")
     ])
 
-    # Callback: перестраивает графики при изменении выбранного магазина
+    # Callback: перестраиваем графики при изменении выбранного магазина
     @app.callback(
         Output("charts-container", "children"),
         Input("shop-dropdown", "value")
     )
     def update_dashboard(selected_shop):
-        with app.server.app_context():
+        with app.server.app_context(): # Формируем sql-запрос для получения из БД необходимых для построения дашборда данных
             articles = db.session.query(
                 TabulatorShopRemainder.category.label("category"),
                 func.count(TabulatorShopRemainder.art).label("arts_amount"),
@@ -118,7 +117,7 @@ def create_dashapp(server):
                 func.count(TabulatorShopRemainder.art).desc()
             ).all()
 
-            df = pd.DataFrame([{
+            df = pd.DataFrame([{ # Создаём датафрейм из полученных данных
                 "category": article.category,
                 "arts_amount": article.arts_amount,
                 "revenue": article.revenue,
