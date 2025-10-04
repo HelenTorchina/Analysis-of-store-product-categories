@@ -58,7 +58,7 @@ def create_dashapp(server):
                 dcc.Dropdown(
                     id="shop-dropdown",
                     options=[{"label": name, "value": name} for name in shop_names],
-                    value="Универ",  # дефолт – первый магазин
+                    value="Пятёрочка",  # дефолт – первый магазин
                     clearable=False,
                     style=STYLES["dropdown"]
                 )
